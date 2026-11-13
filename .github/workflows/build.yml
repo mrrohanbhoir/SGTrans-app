@@ -1,0 +1,45 @@
+name: Build APKs
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract ZIP
+        run: unzip -o "SGTrans-project (1).zip"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build APKs
+        working-directory: lorry-ledger-apps
+        run: |
+          flutter create --platforms=android .
+          python3 scripts/patch_android.py
+          flutter pub get
+          flutter build apk --release -t lib/main_owner.dart
+          cp build/app/outputs/flutter-apk/app-release.apk Owner-App.apk
+          flutter build apk --release -t lib/main_driver.dart
+          cp build/app/outputs/flutter-apk/app-release.apk Driver-App.apk
+          flutter build apk --release -t lib/main_customer.dart
+          cp build/app/outputs/flutter-apk/app-release.apk Customer-App.apk
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: SGTrans-APKs
+          path: lorry-ledger-apps/*.apk
+          
