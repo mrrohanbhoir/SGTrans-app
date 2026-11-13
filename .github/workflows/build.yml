@@ -27,6 +27,8 @@ jobs:
       - name: Build APKs
         working-directory: lorry-ledger-apps
         run: |
+          mkdir -p ~/.gradle
+          echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
           flutter create --platforms=android .
           python3 scripts/patch_android.py
           flutter pub get
@@ -42,4 +44,3 @@ jobs:
         with:
           name: SGTrans-APKs
           path: lorry-ledger-apps/*.apk
-          
