@@ -33,6 +33,10 @@ jobs:
           python3 scripts/patch_android.py
           flutter pub get
 
+          echo "=== OWNER CHECK IN CODE ==="
+          grep -rn "not set up as an owner" lib/ || true
+          grep -rn "collection(" lib/ | head -n 30 || true
+
           PKG=$(grep -oP 'applicationId\s*=?\s*"\K[^"]+' android/app/build.gradle* | head -n 1 || true)
           echo "Detected Package Name: $PKG"
 
