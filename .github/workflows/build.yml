@@ -27,6 +27,7 @@ jobs:
       - name: Build APKs
         working-directory: lorry-ledger-apps
         run: |
+          set -e
           mkdir -p ~/.gradle
           echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
           flutter create --platforms=android .
