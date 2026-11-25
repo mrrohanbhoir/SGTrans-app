@@ -34,10 +34,6 @@ jobs:
           python3 scripts/patch_android.py
           flutter pub get
 
-          echo "=== OWNER CHECK IN CODE ==="
-          grep -rn "not set up as an owner" lib/ || true
-          grep -rn "collection(" lib/ | head -n 30 || true
-
           PKG=$(grep -oP 'applicationId\s*=?\s*"\K[^"]+' android/app/build.gradle* | head -n 1 || true)
           echo "Detected Package Name: $PKG"
 
@@ -45,22 +41,22 @@ jobs:
           cat << 'EOF' > android/app/google-services.json
           {
             "project_info": {
-              "project_number": "26673262400",
-              "firebase_url": "https://rohan-45aef.firebaseio.com",
-              "project_id": "rohan-45aef",
-              "storage_bucket": "rohan-45aef.firebasestorage.app"
+              "project_number": "479129213410",
+              "firebase_url": "https://sgtrans-46ebb.firebaseio.com",
+              "project_id": "sgtrans-46ebb",
+              "storage_bucket": "sgtrans-46ebb.firebasestorage.app"
             },
             "client": [
               {
                 "client_info": {
-                  "mobilesdk_app_id": "1:26673262400:android:8fd7eae238491ef26b94a5",
+                  "mobilesdk_app_id": "1:479129213410:android:8fd7eae238491ef26b94a5",
                   "android_client_info": {
                     "package_name": "com.example.lorry_ledger"
                   }
                 },
                 "oauth_client": [
                   {
-                    "client_id": "26673262400-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
+                    "client_id": "479129213410-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
                     "client_type": 3
                   }
                 ],
@@ -73,7 +69,7 @@ jobs:
                   "appinvite_service": {
                     "other_platform_oauth_client": [
                       {
-                        "client_id": "26673262400-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
+                        "client_id": "479129213410-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
                         "client_type": 3
                       }
                     ]
@@ -95,10 +91,10 @@ jobs:
           class DefaultFirebaseOptions {
             static const FirebaseOptions android = FirebaseOptions(
               apiKey: 'AIzaSyDoddnOtBlLkA-e_PHJSy8t_mlmTwlOhQM',
-              appId: '1:26673262400:android:8fd7eae238491ef26b94a5',
-              messagingSenderId: '26673262400',
-              projectId: 'rohan-45eef',
-              storageBucket: 'rohan-45eef.firebasestorage.app',
+              appId: '1:479129213410:android:8fd7eae238491ef26b94a5',
+              messagingSenderId: '479129213410',
+              projectId: 'sgtrans-46ebb',
+              storageBucket: 'sgtrans-46ebb.firebasestorage.app',
             );
 
             static const FirebaseOptions currentPlatform = android;
