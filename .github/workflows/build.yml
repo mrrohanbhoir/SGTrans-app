@@ -24,9 +24,24 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Build APKs
+      - name: Inject Firebase Options & Build APKs
         working-directory: lorry-ledger-apps
         run: |
+          cat << 'EOF' > lib/firebase_options.dart
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'AIzaSyB82gI2gCK6MVnzd257Vvwv60hxOePcuzso',
+              appId: '1:26673262400:web:81925a2be71483d16b94a5',
+              messagingSenderId: '26673262400',
+              projectId: 'rohan-45eef',
+              storageBucket: 'rohan-45eef.firebasestorage.app',
+            );
+
+            static const FirebaseOptions currentPlatform = android;
+          }
+          EOF
           mkdir -p ~/.gradle
           echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
           flutter create --platforms=android .
