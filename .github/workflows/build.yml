@@ -24,9 +24,14 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Inject Firebase Options & Build APKs
+      - name: Build APKs
         working-directory: lorry-ledger-apps
         run: |
+          mkdir -p ~/.gradle
+          echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
+          flutter create --platforms=android .
+          python3 scripts/patch_android.py
+          flutter pub get
           cat << 'EOF' > lib/firebase_options.dart
           import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 
@@ -42,11 +47,6 @@ jobs:
             static const FirebaseOptions currentPlatform = android;
           }
           EOF
-          mkdir -p ~/.gradle
-          echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
-          flutter create --platforms=android .
-          python3 scripts/patch_android.py
-          flutter pub get
           flutter build apk --release -t lib/main_owner.dart
           cp build/app/outputs/flutter-apk/app-release.apk Owner-App.apk
           flutter build apk --release -t lib/main_driver.dart
