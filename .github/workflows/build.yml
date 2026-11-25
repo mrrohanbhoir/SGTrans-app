@@ -33,6 +33,29 @@ jobs:
           python3 scripts/patch_android.py
           flutter pub get
 
+          grep -rnE "AIzaSy[A-Za-z0-9_-]{20,}" lib/ android/ || true
+          python3 - << 'PY'
+          import pathlib, re
+
+          good_key = "AIzaSyB82gI2gCK6MVnzd257Vvwv60hxOePcuzso"
+          pattern = re.compile(r"AIzaSy[A-Za-z0-9_-]{20,}")
+
+          for folder in ["lib", "android"]:
+              p = pathlib.Path(folder)
+              if not p.exists():
+                  continue
+              for f in p.rglob("*"):
+                  if f.is_file() and f.suffix in {".dart", ".kt", ".java", ".xml", ".json", ".gradle", ".properties"}:
+                      try:
+                          txt = f.read_text(encoding="utf-8", errors="ignore")
+                          if pattern.search(txt):
+                              new_txt = pattern.sub(good_key, txt)
+                              f.write_text(new_txt, encoding="utf-8")
+                              print("Patched key in:", f)
+                      except Exception as e:
+                          print("Skip:", f, e)
+          PY
+
           cat << 'EOF' > lib/firebase_options.dart
           import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 
@@ -46,38 +69,6 @@ jobs:
             );
 
             static const FirebaseOptions currentPlatform = android;
-          }
-          EOF
-
-          mkdir -p android/app
-          cat << 'EOF' > android/app/google-services.json
-          {
-            "project_info": {
-              "project_number": "26673262400",
-              "project_id": "rohan-45eef",
-              "storage_bucket": "rohan-45eef.firebasestorage.app"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:26673262400:web:81925a2be71483d16b94a5",
-                  "android_client_info": {
-                    "package_name": "com.example.lorry_ledger"
-                  }
-                },
-                "api_key": [
-                  {
-                    "current_key": "AIzaSyB82gI2gCK6MVnzd257Vvwv60hxOePcuzso"
-                  }
-                ],
-                "services": {
-                  "appinvite_service": {
-                    "other_platform_oauth_client": []
-                  }
-                }
-              }
-            ],
-            "configuration_version": "1"
           }
           EOF
 
