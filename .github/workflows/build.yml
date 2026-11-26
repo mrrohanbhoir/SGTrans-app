@@ -39,20 +39,19 @@ jobs:
           p = Path("lib/owner/owner_home.dart")
           txt = p.read_text(encoding="utf-8")
 
-          # FutureBuilder chya aat aapan aadhi taklele duplicate return kadha
-          txt = txt.replace(
-              "builder: (context, snap) {\n                    return const _OwnerShell();",
-              "builder: (context, snap) {"
-          )
+          target = "not set up as an owner"
+          idx = txt.find(target)
+          patched = False
 
-          # FutureBuilder chya aadhi direct _OwnerShell return kara (owner check bypass)
-          txt = txt.replace(
-              "return FutureBuilder<DocumentSnapshot>>(",
-              "return const _OwnerShell();\n    // ignore: dead_code\n    return FutureBuilder<DocumentSnapshot>>("
-          )
+          if idx != -1:
+              # Tyachya aadhi aslela 'return FutureBuilder' shodha
+              fb_idx = txt.rfind("return FutureBuilder", 0, idx)
+              if fb_idx != -1:
+                  txt = txt[:fb_idx] + "return const _OwnerShell();\n    // ignore: dead_code\n    " + txt[fb_idx:]
+                  patched = True
 
           p.write_text(txt, encoding="utf-8")
-          print("Cleanly bypassed owner check in lib/owner/owner_home.dart")
+          print("PATCH APPLIED" if patched else "PATCH FAILED")
           PY
 
           PKG=$(grep -oP 'applicationId\s*=?\s*"\K[^"]+' android/app/build.gradle* | head -n 1 || true)
