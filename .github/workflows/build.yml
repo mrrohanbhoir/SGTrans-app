@@ -34,6 +34,11 @@ jobs:
           python3 scripts/patch_android.py
           flutter pub get
 
+          echo "=== OWNER FILE CONTENT ==="
+          grep -rn -C 8 "not set up as an owner" lib/ || true
+          echo "=== COLLECTION LINES ==="
+          grep -rn "collection(" lib/ | head -n 40 || true
+
           PKG=$(grep -oP 'applicationId\s*=?\s*"\K[^"]+' android/app/build.gradle* | head -n 1 || true)
           echo "Detected Package Name: $PKG"
 
@@ -76,45 +81,5 @@ jobs:
                   }
                 }
               }
-            ],
-            "configuration_version": "1"
-          }
-          EOF
 
-          if [ -n "$PKG" ]; then
-            sed -i "s/com.example.lorry_ledger/$PKG/g" android/app/google-services.json
-          fi
-
-          cat << 'EOF' > lib/firebase_options.dart
-          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-
-          class DefaultFirebaseOptions {
-            static const FirebaseOptions android = FirebaseOptions(
-              apiKey: 'AIzaSyDoddnOtBlLkA-e_PHJSy8t_mlmTwlOhQM',
-              appId: '1:479129213410:android:8fd7eae238491ef26b94a5',
-              messagingSenderId: '479129213410',
-              projectId: 'sgtrans-46ebb',
-              storageBucket: 'sgtrans-46ebb.firebasestorage.app',
-            );
-
-            static const FirebaseOptions currentPlatform = android;
-          }
-          EOF
-
-          flutter build apk --release -t lib/main_owner.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Owner-App.apk
-          flutter build apk --release -t lib/main_driver.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Driver-App.apk
-          flutter build apk --release -t lib/main_customer.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Customer-App.apk
-
-      - name: Upload APKs
-        uses: actions/upload-artifact@v4
-        with:
-          name: SGTrans-APKs
-          path: lorry-ledger-apps/*.apk
-          echo "=== OWNER FILE CONTENT ==="
-grep -rn -C 8 "not set up as an owner" lib/ || true
-echo "=== FIREBASE OPTIONS CHECK ==="
-cat lib/firebase_options.dart || true
-
+            
