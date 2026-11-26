@@ -28,90 +28,9 @@ jobs:
         working-directory: lorry-ledger-apps
         run: |
           set -e
-          mkdir -p ~/.gradle
-          echo 'allprojects { tasks.configureEach { if (name.toLowerCase().contains("lint")) enabled = false } }' > ~/.gradle/init.gradle
           flutter create --platforms=android .
           python3 scripts/patch_android.py
           flutter pub get
-
-          PKG=$(grep -oP 'applicationId\s*=?\s*"\K[^"]+' android/app/build.gradle* | head -n 1 || true)
-          if [ -z "$PKG" ]; then
-            PKG="com.example.sgtrans"
-          fi
-          echo "Detected Package Name: $PKG"
-
-          mkdir -p android/app
-          cat <<EOF > android/app/google-services.json
-          {
-            "project_info": {
-              "project_number": "479129213410",
-              "firebase_url": "https://sgtrans-46ebb.firebaseio.com",
-              "project_id": "sgtrans-46ebb",
-              "storage_bucket": "sgtrans-46ebb.firebasestorage.app"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:479129213410:android:8fd7eae238491ef26b94a5",
-                  "android_client_info": {
-                    "package_name": "$PKG"
-                  }
-                },
-                "oauth_client": [
-                  {
-                    "client_id": "479129213410-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
-                    "client_type": 3
-                  }
-                ],
-                "api_key": [
-                  {
-                    "current_key": "AIzaSyDoddnOtBlLkA-e_PHJSy8t_mlmTwlOhQM"
-                  }
-                ],
-                "services": {
-                  "appinvite_service": {
-                    "other_platform_oauth_client": [
-                      {
-                        "client_id": "479129213410-lk1offbr56gaa1sl61o8labqlnr6doja.apps.googleusercontent.com",
-                        "client_type": 3
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "configuration_version": "1"
-          }
-          EOF
-
-          cat <<EOF > lib/firebase_options.dart
-          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-
-          class DefaultFirebaseOptions {
-            static const FirebaseOptions android = FirebaseOptions(
-              apiKey: 'AIzaSyDoddnOtBlLkA-e_PHJSy8t_mlmTwlOhQM',
-              appId: '1:479129213410:android:8fd7eae238491ef26b94a5',
-              messagingSenderId: '479129213410',
-              projectId: 'sgtrans-46ebb',
-              storageBucket: 'sgtrans-46ebb.firebasestorage.app',
-            );
-
-            static const FirebaseOptions currentPlatform = android;
-          }
-          EOF
-
-          flutter build apk --release -t lib/main_owner.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Owner-App.apk
-
-          flutter build apk --release -t lib/main_driver.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Driver-App.apk
-
-          flutter build apk --release -t lib/main_customer.dart
-          cp build/app/outputs/flutter-apk/app-release.apk Customer-App.apk
-
-      - name: Upload APKs
-        uses: actions/upload-artifact@v4
-        with:
-          name: SGTrans-APKs
-          path: lorry-ledger-apps/*.apk
+          echo "=== FIND OWNER FILE ==="
+          grep -rn -C 15 "not set up as an owner" lib/ || true
           
