@@ -113,3 +113,8 @@ jobs:
         with:
           name: SGTrans-APKs
           path: lorry-ledger-apps/*.apk
+          echo "=== OWNER FILE CONTENT ==="
+grep -rn -C 8 "not set up as an owner" lib/ || true
+echo "=== FIREBASE OPTIONS CHECK ==="
+cat lib/firebase_options.dart || true
+
